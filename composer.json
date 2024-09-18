@@ -8,11 +8,22 @@
             "Codeception\\Module\\": "src/"
         }
     },
+    "autoload-dev": {
+        "classmap": [
+            "tests/data/app/data.php"
+        ],
+        "psr-4": {
+            "Tests\\Web\\": "tests/web/"
+        }
+    },
     "authors": [
         {
             "name": "davert",
             "email": "davert.ua@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "codeception/codeception": ">=4.1",
+        "symfony/process": ">=5.1"
+    }
 }

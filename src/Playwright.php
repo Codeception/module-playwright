@@ -1,7 +1,12 @@
 <?php
 namespace Codeception\Module;
 
+use Codeception\Exception\ContentNotFound;
+use Codeception\Exception\ModuleException;
 use Codeception\Module;
+use PHPUnit\Framework\AssertionFailedError;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 /**
  * This module uses Playwright to interact with a browser.
@@ -18,15 +23,50 @@ class Playwright extends Module
 {
     protected array $config = [
         'pw_server' => 'http://localhost:8191',
+        'pw_start' => true,
+        'pw_debug' => false,
+        'timeout' => 5000,
         'url' => '',
         'browser' => 'chromium',
         'show' => true,
     ];
 
+    const string NPM_PACKAGE = 'codeception-module-playwright';
+    protected ?Process $serverProcess = null;
+
     public function _initialize()
-    {;
+    {
+        if ($this->config['pw_start']) {
+
+            $process = new Process(['npx', self::NPM_PACKAGE]);
+            $process->start();
+
+            sleep(2);
+
+            if (!$process->isRunning() && !$process->isSuccessful()) {
+                throw new ProcessFailedException($process);
+            }
+
+            $this->serverProcess = $process;
+        }
+
         $this->config['output_dir'] = codecept_output_dir();
+        $this->config['data_dir'] = codecept_data_dir();
         $this->sendCommand('', $this->config, '/init');
+    }
+
+    public function __destruct()
+    {
+        if ($this->serverProcess) {
+            $this->serverProcess->stop();
+        }
+    }
+    public function _afterSuite()
+    {
+        if ($this->serverProcess) {
+            $this->debug($this->serverProcess->getOutput());
+            $this->serverProcess->stop();
+        }
     }
 
     /**
@@ -90,11 +130,51 @@ class Playwright extends Module
         return $this->sendCommand('_stopBrowser');
     }
 
+    public function amOnSubdomain($url)
+    {
+        throw new ModuleException($this, "amOnSubdomain is not implemented, use \$I->amOnPage(\$url); instead");
+    }
+
+    public function seeOptionIsSelected($opt, $val)
+    {
+        throw new ModuleException($this, "seeOptionIsSelected is not implemented; use \$I->seeElement instead");
+    }
+
+    public function seeInFormFields()
+    {
+        throw new ModuleException($this, "seeInFormFields is not implemented; use \$I->seeElement instead");
+    }
+
+    public function seeLink()
+    {
+        throw new ModuleException($this, "seeLink is not implemented; use \$I->seeElement instead");
+    }
+
+    public function seeInSource($expected)
+    {
+        $this->sendCommand('seeInSource', [$expected]);
+    }
+
+    public function dontSeeInSource($expected)
+    {
+        $this->sendCommand('dontSeeInSource', [$expected]);
+    }
 
     /**
      * {{> amOnPage }}
      */
     public function amOnPage(string $url): void
+    {
+        $this->sendCommand('amOnPage', [$url]);
+    }
+
+    /**
+     * Alias for amOnPage
+     *
+     * @param string $url
+     * @return void
+     */
+    public function amOnUrl(string $url): void
     {
         $this->sendCommand('amOnPage', [$url]);
     }
@@ -123,7 +203,7 @@ class Playwright extends Module
         $this->sendCommand('setPlaywrightRequestHeaders', [$customHeaders]);
     }
 
-    public function moveCursorTo($locator, $offsetX = 0, $offsetY = 0)
+    public function moveMouseOver($locator, $offsetX = 0, $offsetY = 0)
     {
         return $this->sendCommand('moveCursorTo', [$locator, $offsetX, $offsetY]);
     }
@@ -208,16 +288,6 @@ class Playwright extends Module
         return $this->sendCommand('grabTitle');
     }
 
-    public function grabWebElements($locator)
-    {
-        return $this->sendCommand('grabWebElements', [$locator]);
-    }
-
-    public function grabWebElement($locator)
-    {
-        return $this->sendCommand('grabWebElement', [$locator]);
-    }
-
     public function switchToNextTab($num = 1)
     {
         return $this->sendCommand('switchToNextTab', [$num]);
@@ -228,7 +298,7 @@ class Playwright extends Module
         return $this->sendCommand('switchToPreviousTab', [$num]);
     }
 
-    public function closeCurrentTab()
+    public function closeTab()
     {
         return $this->sendCommand('closeCurrentTab');
     }
@@ -248,13 +318,26 @@ class Playwright extends Module
         return $this->sendCommand('grabNumberOfOpenTabs');
     }
 
-    public function seeElement($locator)
+    public function seeNumberOfTabs($expected)
     {
+        $actual = $this->sendCommand('grabNumberOfOpenTabs');
+        $this->assertEquals($expected, $actual, "Number of tabs expected $expected but actual $actual");
+    }
+
+    public function seeElement($locator, $attrs = null)
+    {
+        if ($attrs) {
+            throw new ModuleException($this, "seeElement doesn't accept second param. Use CSS or XPath instead");
+        }
         return $this->sendCommand('seeElement', [$locator]);
     }
 
-    public function dontSeeElement($locator)
+    public function dontSeeElement($locator, $attrs = null)
     {
+        if ($attrs) {
+            throw new ModuleException($this, "seeElement doesn't accept second param. Use CSS or XPath instead");
+        }
+
         return $this->sendCommand('dontSeeElement', [$locator]);
     }
 
@@ -276,6 +359,16 @@ class Playwright extends Module
     public function click($locator, $context = null, $options = [])
     {
         return $this->sendCommand('click', [$locator, $context, $options]);
+    }
+
+    public function clickWithLeftButton($locator, $x, $y)
+    {
+        return $this->sendCommand('click', [$locator, null, ['position' => ['x' => $x, 'y' => $y]]]);
+    }
+
+    public function clickWithRightButton($locator, $x, $y)
+    {
+        return $this->sendCommand('click', [$locator, null, ['button' => 'right', 'position' => ['x' => $x, 'y' => $y]]]);
     }
 
     public function forceClick($locator, $context = null)
@@ -408,7 +501,7 @@ class Playwright extends Module
         return $this->sendCommand('dontSee', [$text, $context]);
     }
 
-    public function grabSource()
+    public function grabPageSource()
     {
         return $this->sendCommand('grabSource');
     }
@@ -423,12 +516,12 @@ class Playwright extends Module
         return $this->sendCommand('grabCurrentUrl');
     }
 
-    public function seeInSource($raw)
+    public function seeInPageSource($raw)
     {
         return $this->sendCommand('seeInSource', [$raw]);
     }
 
-    public function dontSeeInSource($raw)
+    public function dontSeeInPageSource($raw)
     {
         return $this->sendCommand('dontSeeInSource', [$raw]);
     }
@@ -443,9 +536,17 @@ class Playwright extends Module
         return $this->sendCommand('seeNumberOfVisibleElements', [$locator, $num]);
     }
 
-    public function setCookie($cookie)
+    public function setCookie($cookie, $value = null)
     {
+        if (is_string($cookie) && $value) {
+            $cookie = ['name' => $cookie, 'value' => $value, 'url' => $this->config['url']];
+        }
         return $this->sendCommand('setCookie', [$cookie]);
+    }
+
+    public function resetCookie($cookie = null)
+    {
+        return $this->sendCommand('clearCookie', [$cookie]);
     }
 
     public function seeCookie($name)
@@ -460,7 +561,11 @@ class Playwright extends Module
 
     public function grabCookie($name)
     {
-        return $this->sendCommand('grabCookie', [$name]);
+        $cookie = $this->sendCommand('grabCookie', [$name]);
+        if (is_array($cookie)) {
+            return $cookie['value'];
+        }
+        return $cookie;
     }
 
     public function clearCookie()
@@ -478,8 +583,11 @@ class Playwright extends Module
         return $this->sendCommand('grabTextFrom', [$locator]);
     }
 
-    public function grabTextFromAll($locator)
+    public function grabMultiple($locator, $attribute = null)
     {
+        if ($attribute) {
+            return $this->sendCommand('grabAttributeFromAll', [$locator, $attribute]);
+        }
         return $this->sendCommand('grabTextFromAll', [$locator]);
     }
 
@@ -538,12 +646,12 @@ class Playwright extends Module
         return $this->sendCommand('grabAttributeFromAll', [$locator, $attr]);
     }
 
-    public function saveElementScreenshot($locator, $fileName)
+    public function makeElementScreenshot($locator, $fileName)
     {
         return $this->sendCommand('saveElementScreenshot', [$locator, $fileName]);
     }
 
-    public function saveScreenshot($fileName, $fullPage = null)
+    public function makeScreenshot($fileName, $fullPage = null)
     {
         return $this->sendCommand('saveScreenshot', [$fileName, $fullPage]);
     }
@@ -613,7 +721,7 @@ class Playwright extends Module
         return $this->sendCommand('waitForResponse', [$urlOrPredicate, $sec]);
     }
 
-    public function switchTo($locator)
+    public function switchToIFrame($locator = null)
     {
         return $this->sendCommand('switchTo', [$locator]);
     }
@@ -698,6 +806,21 @@ class Playwright extends Module
         return $this->sendCommand('grabRecordedNetworkTraffics');
     }
 
+    public function acceptPopup()
+    {
+        return $this->sendCommand('acceptPopup');
+    }
+
+    public function cancelPopup()
+    {
+        return $this->sendCommand('cancelPopup');
+    }
+
+    public function seeInPopup($text)
+    {
+        return $this->sendCommand('seeInPopup', [$text]);
+    }
+
     public function seeTraffic($params)
     {
         return $this->sendCommand('seeTraffic', [$params]);
@@ -758,30 +881,53 @@ class Playwright extends Module
             'Accept: application/json',
             'Connection: close',
         ]);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+
+        if (isset($arguments[0]) && is_string($arguments[0]) && str_starts_with($arguments[0], 'wait')) {
+            // request with wait can take long time
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->config['timeout'] * 100);
+        } else {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->config['timeout']);
+        }
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
-        $this->debugSection('PW Command', $data);
+        if ($this->config['pw_debug']) {
+            $this->debugSection('PW Command', $data);
+        }
 
         $result = curl_exec($ch);
+
+        if ($result === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new ModuleException($this, "Playwright server did not respond. Error: $error");
+        }
 
         $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         curl_close($ch);
 
-        if ($httpStatusCode >= 400) {
+        if (!$httpStatusCode || $httpStatusCode === 500) {
+            if ($this->config['pw_debug']) {
+                $this->debugSection('PW Error', "Error response");
+            }
+
             $json = json_decode($result, true);
             if (!isset($json['message'])) {
-                throw new ModuleException($this, "Error for $command");
+                throw new AssertionFailedError("Error for $command");
             }
-            throw new ModuleException($this, $json['message']);
+            throw new AssertionFailedError($json['message']);
         }
 
         $json = json_decode($result, true);
-        if ($json['result']) {
-            $this->debugSection('PW Result', $json['result']);
+        if (isset($json['result'])) {
+            if ($this->config['pw_debug']) {
+                $this->debugSection('PW Result', $json['result']);
+            }
+
             return $json['result'];
         }
+
+        return null;
     }
 }

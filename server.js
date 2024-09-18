@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const express = require('express');
 const Playwright = require('codeceptjs/lib/helper/Playwright');
 const app = express();
@@ -20,8 +21,10 @@ app.post('/init', async (req, res) => {
   const { arguments } = req.body;
 
   // where we store artifacts
-  global.output_dir = arguments.output_dir || './output';
+  global.output_dir = arguments.output_dir || './tests/_output';
+  global.codecept_dir = arguments.data_dir || './tests/_data';
   delete arguments.output_dir;
+  delete arguments.data_dir;
 
   delete arguments.pw_server;
 

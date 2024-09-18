@@ -6,7 +6,7 @@
 This module does not implement Playwright API in PHP, rather proxies requests to Playwright helper of [CodeceptJS](https://codecept.io). This is possible because Codeception and CodeceptJS share the same architecture principles and interface for web testing is quiet the same.
 
 > [!Note]
-> This module can be used as a replacement for WebDriver module. Comparing to WebDriver module, Playwright module can speed up your tests x3 times, run in headless mode, record videos, and stack traces out of the box
+> This module can be used as a replacement for WebDriver module. Comparing to WebDriver module, Playwright module can **speed up your tests x3 times**, run in headless mode, record videos, and stack traces out of the box
 
 ## Requirements
 
@@ -15,7 +15,7 @@ This module does not implement Playwright API in PHP, rather proxies requests to
 
 ## Installation
 
-> ![Warning]
+> [!Warning]
 > This module is experimental. It is in early development stage. Please report any issues you find.
 
 Install NodeJS part of this module, it will install Playwright and CodeceptJS
@@ -26,7 +26,7 @@ npm install codeception-playwright-module
 Install Playwright browsers
 
 ```
-npx playwright install
+npx playwright install --with-deps
 ```
 
 Install PHP part of this module
@@ -96,6 +96,7 @@ Complete API reference is available in [CodeceptJS Playwright Helper](https://co
 
 ```php
 $I->amOnPage('/');
+$I->click('#first .clickable');
 $I->dontSeeInTitle('Error');
 $I->see('Hello, world!');
 ```

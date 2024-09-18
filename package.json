@@ -1,10 +1,13 @@
 {
-  "name": "module-playwright",
-  "version": "1.0.0",
+  "name": "codeception-module-playwright",
+  "version": "0.1.1",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "codeception-module-playwright": "./server.js"
   },
   "keywords": [],
   "author": "",

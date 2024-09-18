@@ -1,0 +1,12 @@
+actor: WebGuy
+modules:
+  enabled:
+    - Playwright:
+        url: http://127.0.0.1:8000
+        browser: chromium
+        window_size: 1200x768
+        timeout: 1000
+        show: false
+        restart: true
+        pw_debug: true
+      # restart: true # Use a new browser window for each test (to isolate test cases from each other)

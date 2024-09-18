@@ -47,8 +47,24 @@ modules:
             browser: 'chromium'
             show: true
 ```
+Most common config values are:
+
+* `url` - base url to open pages from
+* `browser` - either `chromium`, `firefox`, `webkit`
+* `show` - (default: `true`) to show browser or set to `false` to run tests in headless mode 
+* `timeout` - (default: `5000`) timeout (in ms) for all Playwright operations
+* `pw_start` - (default: `true`) start Playwright Server (Proxy to CodeceptJS) automatically. Set to `false` and run server manually in case server doesn't start.
+* `pw_server` - (default: 'http://localhost:8191') url of Playwright Server 
+* `pw_debug` - (default: `false`) print Playwright Server debug information
+* `video` - save video on fail
+* `trace` - save traces on fail
+
+More configuration options are is listed on [CodeceptJS Playwright page](https://codecept.io/helpers/Playwright/#configuration)
+
+
 > [!Tip]
 > This module is designed as drop-in WebDriver module replacement, you can change `WebDriver` to `Playwright` in your tests and try how it works!
+
 
 ## Usage
 
@@ -90,7 +106,9 @@ modules:
 
 This module provides the same API as WebDriver module. You can try to use it in your tests without any changes.
 
-Complete API reference is available in [CodeceptJS Playwright Helper](https://codecept.io/helpers/Playwright/)
+For the full command list see [WebDriver module reference](https://codeception.com/docs/modules/WebDriver#dontSeeElement).
+
+Playwright-specific commands are also available in [CodeceptJS Playwright Helper](https://codecept.io/helpers/Playwright/)
 
 ## Example
 

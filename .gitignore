@@ -1,6 +1,7 @@
 composer.phar
 /vendor/
 /node_modules
+tests/output/
 
 composer.lock
 package-lock.json

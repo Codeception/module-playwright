@@ -37,7 +37,7 @@ class Playwright extends Module
     public function _initialize()
     {
         if ($this->config['pw_start']) {
-            $process = new Process(['npx', self::NPM_PACKAGE]);
+            $process = new Process(['npx', '-y', self::NPM_PACKAGE]);
             $process->start();
 
             sleep(2);

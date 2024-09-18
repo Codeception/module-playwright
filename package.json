@@ -4,11 +4,17 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "post-install-cmd": [
+      "npm install codeception-module-playwright"
+    ],
+    "post-update-cmd": [
+      "npm install codeception-module-playwright"
+    ]
   },
   "bin": {
     "codeception-module-playwright": "./server.js"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",

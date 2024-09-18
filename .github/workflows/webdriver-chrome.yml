@@ -17,7 +17,7 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: Install dependencies
+    - name: Install NPM dependencies
       run: npm i
 
     - name: Install Playwright Browsers
@@ -42,10 +42,8 @@ jobs:
     - name: Start dev server
       run: php -S 127.0.0.1:8000 -t tests/data/app >/dev/null 2>&1 &
 
-    - name: Start playwright proxy server
-      run: node server.js >/dev/null 2>&1 &
     - name: Tests
-      run: php ./vendor/bin/codecept run --env chrome
+      run: php ./vendor/bin/codecept run
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md

@@ -23,7 +23,7 @@
         }
     ],
     "require": {
-        "codeception/codeception": ">=4.1",
-        "symfony/process": ">=5.1"
+        "codeception/codeception": "^5.0",
+        "symfony/process": "^6 || ^7"
     }
 }

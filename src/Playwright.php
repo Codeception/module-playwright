@@ -1,7 +1,7 @@
 <?php
+
 namespace Codeception\Module;
 
-use Codeception\Exception\ContentNotFound;
 use Codeception\Exception\ModuleException;
 use Codeception\Module;
 use PHPUnit\Framework\AssertionFailedError;
@@ -31,13 +31,12 @@ class Playwright extends Module
         'show' => true,
     ];
 
-    const string NPM_PACKAGE = 'codeception-module-playwright';
+    private const NPM_PACKAGE = 'codeception-module-playwright';
     protected ?Process $serverProcess = null;
 
     public function _initialize()
     {
         if ($this->config['pw_start']) {
-
             $process = new Process(['npx', self::NPM_PACKAGE]);
             $process->start();
 
@@ -368,7 +367,9 @@ class Playwright extends Module
 
     public function clickWithRightButton($locator, $x, $y)
     {
-        return $this->sendCommand('click', [$locator, null, ['button' => 'right', 'position' => ['x' => $x, 'y' => $y]]]);
+        return $this->sendCommand('click', [$locator, null, [
+            'button' => 'right', 'position' => ['x' => $x, 'y' => $y]]
+        ]);
     }
 
     public function forceClick($locator, $context = null)

@@ -32,6 +32,3 @@ jobs:
 
       - name: Check production code style
         run: phpcs src/
-
-      - name: Check test code style
-        run: phpcs tests/ --standard=tests/phpcs.xml

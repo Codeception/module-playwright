@@ -237,7 +237,7 @@ class Playwright extends Module
         return $this->sendCommand('restartBrowser', [$contextOptions]);
     }
 
-    public function refreshPage()
+    public function reloadPage()
     {
         return $this->sendCommand('refreshPage');
     }
@@ -482,6 +482,13 @@ class Playwright extends Module
         return $this->sendCommand('seeCurrentUrlEquals', [$uri]);
     }
 
+    public function seeCurrentUrlMatches($regexp)
+    {
+        $url = $this->sendCommand('grabCurrentUrl');
+
+        $this->assertMatchesRegularExpression($regexp, $url, 'URL doesn\'t match the regular expression');
+    }
+
     public function dontSeeCurrentUrlEquals($uri)
     {
         return $this->sendCommand('dontSeeCurrentUrlEquals', [$uri]);
@@ -512,7 +519,7 @@ class Playwright extends Module
         return $this->sendCommand('grabBrowserLogs');
     }
 
-    public function grabCurrentUrl()
+    public function grabFromCurrentUrl()
     {
         return $this->sendCommand('grabCurrentUrl');
     }
@@ -574,7 +581,7 @@ class Playwright extends Module
         return $this->sendCommand('clearCookie');
     }
 
-    public function executeScript($fn, $arg = null)
+    public function executeJS($fn, $arg = null)
     {
         return $this->sendCommand('executeScript', [$fn, $arg]);
     }
@@ -692,12 +699,12 @@ class Playwright extends Module
         return $this->sendCommand('waitForElement', [$locator, $sec]);
     }
 
-    public function waitForVisible($locator, $sec = null)
+    public function waitForElementVisible($locator, $sec = null)
     {
         return $this->sendCommand('waitForVisible', [$locator, $sec]);
     }
 
-    public function waitForInvisible($locator, $sec = null)
+    public function waitForElementNotVisible($locator, $sec = null)
     {
         return $this->sendCommand('waitForInvisible', [$locator, $sec]);
     }
@@ -727,7 +734,7 @@ class Playwright extends Module
         return $this->sendCommand('switchTo', [$locator]);
     }
 
-    public function waitForFunction($fn, $argsOrSec = null, $sec = null)
+    public function waitForJS($fn, $argsOrSec = null, $sec = null)
     {
         return $this->sendCommand('waitForFunction', [$fn, $argsOrSec, $sec]);
     }
@@ -745,6 +752,11 @@ class Playwright extends Module
     public function waitForDetached($locator, $sec = null)
     {
         return $this->sendCommand('waitForDetached', [$locator, $sec]);
+    }
+
+    public function waitForElementClickable($locator, $sec = null)
+    {
+        return $this->sendCommand('waitForClickable', [$locator, $sec]);
     }
 
     public function waitForCookie($name, $sec = null)

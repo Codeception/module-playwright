@@ -1,9 +1,9 @@
 
 # Playwright module for Codeception
 
-🚀 This is the **first and the only module that allows [Playwright](https://playwright.dev) testing in PHP**. Playwright allows testing in Chrome, Firefox, Webkit (safari). It is faster and more reliable alternative to Selenium WebDriver from Microsoft. Finally it is available in PHP!
+🚀 This is the **first and the only module that allows [Playwright](https://playwright.dev) testing in PHP**. Playwright allows testing in Chrome, Firefox, Webkit (safari). It is faster and more reliable alternative to Selenium WebDriver. Finally it is available in PHP!
 
-This module does not implement Playwright API in PHP, rather proxies requests to Playwright helper of [CodeceptJS](https://codecept.io). This is possible because Codeception and CodeceptJS share the same architecture principles and interface for web testing is quiet the same.
+This module does not implement Playwright API in PHP, rather proxies requests to Playwright helper of [CodeceptJS](https://codecept.io). This is possible because Codeception and CodeceptJS share the same architecture principles, and the interface for web testing is quite the same.
 
 > [!Note]
 > This module can be used as a replacement for WebDriver module. Comparing to WebDriver module, Playwright module can **speed up your tests x3 times**, run in headless mode, record videos, and stack traces out of the box

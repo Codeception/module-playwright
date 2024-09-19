@@ -21,7 +21,7 @@ This module does not implement Playwright API in PHP, rather proxies requests to
 Install NodeJS part of this module, it will install Playwright and CodeceptJS
 
 ```
-npm install codeception-playwright-module
+npm install codeception-module-playwright
 ```
 Install Playwright browsers
 

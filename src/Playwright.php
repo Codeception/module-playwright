@@ -4,6 +4,8 @@ namespace Codeception\Module;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Module;
+use Codeception\TestInterface;
+use Exception;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -91,17 +93,28 @@ class Playwright extends Module
      *
      * @param mixed $test The test case.
      */
-    public function _before(mixed $test): void
+    public function _before(TestInterface $test): void
     {
-        $this->sendCommand('_before', [$test]);
+        $this->sendCommand('_before', [
+            'test' => ['title' => $test->getMetadata()->getName()],
+        ]);
     }
 
     /**
      * Execute actions after a test.
      */
-    public function _after(mixed $test): void
+    public function _after(TestInterface $test): void
     {
-        $this->sendCommand('_after');
+        $this->sendCommand('_after', [
+            'test' => ['title' => $test->getMetadata()->getName()],
+        ]);
+    }
+
+    public function _failed(TestInterface $test, Exception $fail)
+    {
+        $this->sendCommand('_failed', [
+            'test' => ['title' => $test->getMetadata()->getName()],
+        ]);
     }
 
     public function _restart()

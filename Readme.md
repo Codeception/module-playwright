@@ -1,22 +1,23 @@
 
 # Playwright module for Codeception
 
-🚀 This is the **first and the only module that allows [Playwright](https://playwright.dev) testing in PHP**. Playwright allows testing in Chrome, Firefox, Webkit (safari). It is faster and more reliable alternative to Selenium WebDriver. Finally it is available in PHP!
+🚀 This is the **first and the only library that features [Playwright](https://playwright.dev) testing in PHP**. Playwright allows testing in Chrome, Firefox, Webkit (safari). It is faster and more reliable alternative to Selenium WebDriver. Finally it is available in PHP!
 
 This module does not implement Playwright API in PHP, rather proxies requests to Playwright helper of [CodeceptJS](https://codecept.io). This is possible because Codeception and CodeceptJS share the same architecture principles, and the interface for web testing is quite the same.
 
+> [!Warning]
+> This module is experimental. It is in early development stage. Please report any issues you find.
+
 > [!Note]
-> This module can be used as a replacement for WebDriver module. Comparing to WebDriver module, Playwright module can **speed up your tests x3 times**, run in headless mode, record videos, and stack traces out of the box
+> This module can be used as a drop-in replacement for Codeception's [module WebDriver](https://codeception.com/docs/modules/WebDriver). Comparing to WebDriver, Playwright can **speed up your tests x3 times**, run in headless mode, record videos and stack traces out of the box
+> Since this module provides the same API as module WebDriver, you can use it in your tests without any changes.
 
 ## Requirements
 
 * PHP 8.1+
-* NodeJS 20+
+* [NodeJS 20+](https://nodejs.org/)
 
 ## Installation
-
-> [!Warning]
-> This module is experimental. It is in early development stage. Please report any issues you find.
 
 Install NodeJS part of this module, it will install Playwright and CodeceptJS
 
@@ -104,11 +105,7 @@ modules:
 
 ## API
 
-This module provides the same API as WebDriver module. You can try to use it in your tests without any changes.
-
-For the full command list see [WebDriver module reference](https://codeception.com/docs/modules/WebDriver#dontSeeElement).
-
-Playwright-specific commands are also available in [CodeceptJS Playwright Helper](https://codecept.io/helpers/Playwright/)
+Besides supporting all commands of Module Webdriver, there are Playwright-specific commands available in [CodeceptJS Playwright Helper](https://codecept.io/helpers/Playwright/).
 
 ## Example
 

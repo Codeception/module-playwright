@@ -40,26 +40,20 @@ Enable the module in `codeception.yml`:
 modules:
     enabled:
         - Playwright:
-            url: 'http://localhost'
-            browser: 'chromium'
-            show: true
+            url: 'http://localhost' # Base url to open pages from
+            browser: 'chromium' # Either `chromium`, `firefox`, `webkit`
+            show: true # Show the browser (=default) or run tests in headless mode
+            timeout: 5000 # Timeout (in ms) for all Playwright operations. Default: 5000
+            pw_start: true # Start Playwright server (proxy to CodeceptJS) automatically. Set to `false` and run the server manually in case the server doesn't start.
+            pw_server: http://localhost:8191 # Url of Playwright server. Default: http://localhost:8191
+            pw_debug: false # Print Playwright server debug information. Default: false
+            video: true # Save video on fail
+            trace: true # Save stack traces on fail
 ```
-Most common config values are:
-
-* `url`: Base url to open pages from
-* `browser`: Either `chromium`, `firefox`, `webkit`
-* `show` (default: `true`): Show the browser or run tests in headless mode 
-* `timeout` (default: `5000`): Timeout (in ms) for all Playwright operations
-* `pw_start` (default: `true`): Start Playwright server (proxy to CodeceptJS) automatically. Set to `false` and run the server manually in case the server doesn't start.
-* `pw_server` (default: `http://localhost:8191`): Url of Playwright server
-* `pw_debug` (default: `false`): Print Playwright server debug information
-* `video`: Save video on fail
-* `trace`: Save stack traces on fail
-
-More configuration options are is listed on [CodeceptJS Playwright page](https://codecept.io/helpers/Playwright/#configuration)
+More configuration options are listed on [CodeceptJS Playwright page](https://codecept.io/helpers/Playwright/#configuration)
 
 > [!Tip]
-> This module is designed as drop-in WebDriver module replacement, you can change `WebDriver` to `Playwright` in your tests and try how it works!
+> If you're switching from WebDriver, just change `WebDriver` to `Playwright` and see how it works!
 
 ## Usage
 

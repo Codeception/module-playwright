@@ -34,7 +34,7 @@ composer require codeception/module-playwright --dev
 
 ## Configuration
 
-Enable the module in `codeception.yml`:
+Enable the module in `Acceptance.suite.yml`:
 
 ```yaml
 modules:
@@ -47,6 +47,8 @@ modules:
             pw_start: true # Start Playwright server (proxy to CodeceptJS) automatically. Set to `false` and run the server manually in case the server doesn't start.
             pw_server: http://localhost:8191 # Url of Playwright server. Default: http://localhost:8191
             pw_debug: false # Print Playwright server debug information. Default: false
+
+            # Not implemented yet:
             video: true # Save video on fail
             trace: true # Save stack traces on fail
 ```

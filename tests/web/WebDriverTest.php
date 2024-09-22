@@ -426,6 +426,39 @@ final class WebDriverTest extends TestsForBrowsers
         $this->module->see('Lots of valuable data here');
     }
 
+    public function testReloadPage()
+    {
+        $this->module->amOnPage('/');
+        $this->module->reloadPage();
+        $this->module->see('Welcome to test app!');
+    }
+
+    public function testExecuteJS()
+    {
+        $this->module->amOnPage('/');
+        $this->module->see('Test Link');
+        $this->module->executeJS("document.getElementById('area1').style.display = 'none'");
+        $this->module->dontSee('Test Link');
+    }
+
+    public function testGrabFromCurrentUrl()
+    {
+        $this->module->amOnPage('/');
+        $this->module->click('Test');
+        $url = $this->module->grabFromCurrentUrl();
+        $this->assertEquals('http://127.0.0.1:8000/form/hidden', $url);
+        $this->module->seeCurrentUrlMatches('~hidden~');
+    }
+
+    public function testWaiters()
+    {
+        $this->module->amOnPage('/');
+        $this->module->waitForElementClickable('#link');
+        $this->module->waitForElementVisible('#link');
+
+        $this->module->amOnPage('/info');
+        $this->module->waitForElementNotVisible('Invisible text');
+    }
 
     public function testGrabPageSourceWhenOnPage()
     {

@@ -86,7 +86,7 @@ extensions:
 If you start server on different host or port, run port with `--port` option:
 
 ```
-npx codeception-playwright-module --playwright 9999
+npx codeception-playwright-module --port 9999
 ```
 
 And pass port to config
@@ -98,7 +98,7 @@ modules:
             url: 'http://localhost'
             browser: 'chromium'
             show: true
-            pw_server: http://otherhost:8191
+            pw_server: http://localhost:8191
 ```
 
 ## API

@@ -53,7 +53,6 @@ Most common config values are:
 * `browser` - either `chromium`, `firefox`, `webkit`
 * `show` - (default: `true`) to show browser or set to `false` to run tests in headless mode 
 * `timeout` - (default: `5000`) timeout (in ms) for all Playwright operations
-* `pw_start` - (default: `true`) start Playwright Server (Proxy to CodeceptJS) automatically. Set to `false` and run server manually in case server doesn't start.
 * `pw_server` - (default: 'http://localhost:8191') url of Playwright Server 
 * `pw_debug` - (default: `false`) print Playwright Server debug information
 * `video` - save video on fail
@@ -68,28 +67,29 @@ More configuration options are is listed on [CodeceptJS Playwright page](https:/
 
 ## Usage
 
-Playwright module requires NodeJS server to be running. Playwright module will start it and stop automatically. Default port is **8191**.
+Playwright module requires NodeJS server to be running. Start the server manually:
 
-If you want to disable automatic server start, set `start` option to `false`:
-
-```yaml
-modules:
-    enabled:
-        - Playwright:
-            url: 'http://localhost'
-            browser: 'chromium'
-            show: true
-            pw_start: false
 ```
-
-In this case you can start the server manually:
-
-```bash
 npx codeception-playwright-module
 ```
-Please check that server can be started with no issues.
 
-If you start server on different host or port, you can configure it:
+If you want to start server automatically, use [RunProcess extension](https://codeception.com/extensions#RunProcess) from Codeception
+
+```yaml
+extensions:
+    enabled:
+        - Codeception\Extension\RunProcess:
+            0: npx codeception-playwright-module
+            sleep: 3 # wait 5 seconds for processes to boot
+```
+
+If you start server on different host or port, run port with `--port` option:
+
+```
+npx codeception-playwright-module --playwright 9999
+```
+
+And pass port to config
 
 ```yaml
 modules:
@@ -98,7 +98,6 @@ modules:
             url: 'http://localhost'
             browser: 'chromium'
             show: true
-            pw_start: false
             pw_server: http://otherhost:8191
 ```
 
@@ -116,6 +115,8 @@ Playwright-specific commands are also available in [CodeceptJS Playwright Helper
 $I->amOnPage('/');
 $I->click('#first .clickable');
 $I->dontSeeInTitle('Error');
+$I->fillField('Username', 'John');
+$I->fillField('Password', '1233456');
 $I->see('Hello, world!');
 ```
 

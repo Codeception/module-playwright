@@ -15,6 +15,8 @@ process.on('uncaughtException', (error) => {
 
 let playwright;
 
+const tests = {};
+
 console.log('Playwright server started, waiting for init command');
 
 app.post('/init', async (req, res) => {
@@ -38,6 +40,54 @@ app.post('/init', async (req, res) => {
     console.error('Error initializing Playwright: ', e.message);
     res.status(400).json({ message: e.message });
   }
+});
+
+app.get('/test/:id', async (req, res) => {
+  const id = req.params.id; // Accessing the id value from the URL
+  res.status(200).json(tests[id]);
+});
+
+app.post('/test', async (req, res) => {
+  const { id, title } = req.body;
+
+  if (!tests[id]) tests[id] = { title }
+
+});
+
+app.post('/hook', async (req, res) => {
+  const { command, arguments } = req.body;
+
+  const hook = command;
+  const { id, title } = arguments;
+
+  try {
+    let result;
+    switch (hook) {
+      case 'beforeSuite':
+      case 'afterSuite':
+        result = await playwright[`_${hook}`]();
+        break;
+      case 'before':
+        if (!tests[id]) tests[id] = { title }
+      case 'failed':
+        const fileName = `${id}_failed.png`;
+        try {
+          await playwright.saveScreenshot(fileName);
+          tests[id].artifacts ||= {}
+          tests[id].artifacts.screenshot = fileName;
+        } catch (err) {
+          // not matter
+        }
+      default:
+        result = await playwright[`_${hook}`](tests[id]);
+    }
+
+    res.status(200).json({ result, test: tests[id] });
+  } catch (error) {
+    const message = error.inspect ? error.inspect() : error.message;
+    res.status(500).json({ message });
+  }
+
 });
 
 app.post('/command', async (req, res) => {

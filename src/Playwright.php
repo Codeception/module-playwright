@@ -4,6 +4,8 @@ namespace Codeception\Module;
 
 use Codeception\Exception\ModuleException;
 use Codeception\Module;
+use Codeception\TestInterface;
+use Exception;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -23,7 +25,6 @@ class Playwright extends Module
 {
     protected array $config = [
         'pw_server' => 'http://localhost:8191',
-        'pw_start' => true,
         'pw_debug' => false,
         'timeout' => 5000,
         'url' => '',
@@ -32,40 +33,15 @@ class Playwright extends Module
     ];
 
     private const NPM_PACKAGE = 'codeception-module-playwright';
-    protected ?Process $serverProcess = null;
+
+    protected string $testId;
+    protected bool $testHasFailed = false;
 
     public function _initialize()
     {
-        if ($this->config['pw_start']) {
-            $process = new Process(['npx', '-y', self::NPM_PACKAGE]);
-            $process->start();
-
-            sleep(2);
-
-            if (!$process->isRunning() && !$process->isSuccessful()) {
-                throw new ProcessFailedException($process);
-            }
-
-            $this->serverProcess = $process;
-        }
-
         $this->config['output_dir'] = codecept_output_dir();
         $this->config['data_dir'] = codecept_data_dir();
         $this->sendCommand('', $this->config, '/init');
-    }
-
-    public function __destruct()
-    {
-        if ($this->serverProcess) {
-            $this->serverProcess->stop();
-        }
-    }
-    public function _afterSuite()
-    {
-        if ($this->serverProcess) {
-            $this->debug($this->serverProcess->getOutput());
-            $this->serverProcess->stop();
-        }
     }
 
     /**
@@ -75,7 +51,7 @@ class Playwright extends Module
      */
     public function _beforeSuite(array $settings = [])
     {
-        $this->sendCommand('_beforeSuite');
+        $this->sendCommand('beforeSuite', [], 'hook');
     }
 
     /**
@@ -83,7 +59,8 @@ class Playwright extends Module
      */
     public function _init(): void
     {
-        $this->sendCommand('_init');
+        $this->testHasFailed = false;
+        $this->sendCommand('init', [], 'hook');
     }
 
     /**
@@ -91,17 +68,48 @@ class Playwright extends Module
      *
      * @param mixed $test The test case.
      */
-    public function _before(mixed $test): void
+    public function _before(TestInterface $test): void
     {
-        $this->sendCommand('_before', [$test]);
+        $this->testId = uniqid();
+        $this->currentTest = null;
+        $this->testHasFailed = false;
+        $this->sendCommand('before', [
+            'id' => $this->testId,
+            'title' => $test->getMetadata()->getName(),
+            ],
+            'hook'
+        );
     }
 
     /**
      * Execute actions after a test.
      */
-    public function _after(mixed $test): void
+    public function _after(TestInterface $test): void
     {
-        $this->sendCommand('_after');
+        // no passed hook in Codeception. Btw, why?
+        if (!$this->testHasFailed) {
+            $this->sendCommand('passed', [
+                'id' => $this->testId,
+            ], 'hook');
+        }
+        $this->sendCommand('_after', [
+            'id' => $this->testId,
+        ], 'hook');
+
+        if ($this->currentTest && $this->currentTest['artifacts']) {
+            foreach ($this->currentTest['artifacts'] as $artifact => $file) {
+                $test->getMetadata()->addReport($artifact, $file);
+            }
+            unset($this->currentTest);
+        }
+    }
+
+    public function _failed(TestInterface $test, Exception $fail)
+    {
+        $this->sendCommand('failed', [
+            'id' => $this->testId,
+        ], 'hook');
+        $this->testHasFailed = true;
     }
 
     public function _restart()
@@ -933,6 +941,11 @@ class Playwright extends Module
         }
 
         $json = json_decode($result, true);
+
+        if (isset($json['test'])) {
+            $this->currentTest = $json['test'];
+        }
+
         if (isset($json['result'])) {
             if ($this->config['pw_debug']) {
                 $this->debugSection('PW Result', $json['result']);

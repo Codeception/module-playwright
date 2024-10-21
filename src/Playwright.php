@@ -73,7 +73,9 @@ class Playwright extends Module
         $this->testId = uniqid();
         $this->currentTest = null;
         $this->testHasFailed = false;
-        $this->sendCommand('before', [
+        $this->sendCommand(
+            'before',
+            [
             'id' => $this->testId,
             'title' => $test->getMetadata()->getName(),
             ],
@@ -97,11 +99,10 @@ class Playwright extends Module
         ], 'hook');
 
         if ($this->currentTest) {
-
             $this->debugSection('Test', $this->currentTest);
 
             if (isset($this->currentTest['artifacts'])) {
-            foreach ($this->currentTest['artifacts'] as $artifact => $file) {
+                foreach ($this->currentTest['artifacts'] as $artifact => $file) {
                     $test->getMetadata()->addReport($artifact, $file);
                 }
             }

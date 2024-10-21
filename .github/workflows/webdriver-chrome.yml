@@ -44,6 +44,10 @@ jobs:
 
     - name: Start playwright proxy server
       run: node server.js >/dev/null 2>&1 &
+
+    # Wait for the server to start
+    - run: sleep 2
+
     - name: Tests
       run: php ./vendor/bin/codecept run
 

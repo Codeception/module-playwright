@@ -455,9 +455,18 @@ final class WebDriverTest extends TestsForBrowsers
         $this->module->amOnPage('/');
         $this->module->waitForElementClickable('#link');
         $this->module->waitForElementVisible('#link');
-
+        
         $this->module->amOnPage('/info');
         $this->module->waitForElementNotVisible('Invisible text');
+
+    }
+
+    #[Skip('Bug in CodeceptJS')]
+    public function testWaitForText()
+    {
+        $this->module->amOnPage('/');
+        $this->module->waitForText('debug!');
+        $this->module->waitForText('"debug!"');
     }
 
     public function testGrabPageSourceWhenOnPage()

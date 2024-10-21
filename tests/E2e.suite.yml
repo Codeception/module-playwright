@@ -1,0 +1,14 @@
+actor: E2eTester
+suite_namespace: \E2e
+modules:
+  enabled:
+    - Playwright:
+        url: http://127.0.0.1:8000
+        browser: chromium
+        window_size: 1200x768
+        timeout: 1000
+        show: false
+        restart: true
+        pw_debug: true
+        video: true
+        trace: true

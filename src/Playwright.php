@@ -92,13 +92,18 @@ class Playwright extends Module
                 'id' => $this->testId,
             ], 'hook');
         }
-        $this->sendCommand('_after', [
+        $this->sendCommand('after', [
             'id' => $this->testId,
         ], 'hook');
 
-        if ($this->currentTest && $this->currentTest['artifacts']) {
+        if ($this->currentTest) {
+
+            $this->debugSection('Test', $this->currentTest);
+
+            if (isset($this->currentTest['artifacts'])) {
             foreach ($this->currentTest['artifacts'] as $artifact => $file) {
-                $test->getMetadata()->addReport($artifact, $file);
+                    $test->getMetadata()->addReport($artifact, $file);
+                }
             }
             unset($this->currentTest);
         }
@@ -893,6 +898,10 @@ class Playwright extends Module
         ]);
 
         $url = $this->config['pw_server'];
+
+        if (!str_starts_with($endpoint, '/')) {
+            $endpoint = '/' . $endpoint;
+        }
 
         $ch = curl_init($url . $endpoint);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

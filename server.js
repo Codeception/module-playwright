@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const express = require('express');
 const Playwright = require('codeceptjs/lib/helper/Playwright');
+const path = require('path');
 const app = express();
 const port = 8191;
 app.use(express.json());
@@ -47,13 +48,6 @@ app.get('/test/:id', async (req, res) => {
   res.status(200).json(tests[id]);
 });
 
-app.post('/test', async (req, res) => {
-  const { id, title } = req.body;
-
-  if (!tests[id]) tests[id] = { title }
-
-});
-
 app.post('/hook', async (req, res) => {
   const { command, arguments } = req.body;
 
@@ -73,16 +67,19 @@ app.post('/hook', async (req, res) => {
         const fileName = `${id}_failed.png`;
         try {
           await playwright.saveScreenshot(fileName);
-          tests[id].artifacts ||= {}
-          tests[id].artifacts.screenshot = fileName;
+          if (!tests[id]) tests[id] = { title }
+          if (!tests[id].artifacts) tests[id].artifacts = {}
+          tests[id].artifacts.screenshot = path.join(output_dir, fileName);
         } catch (err) {
+          console.error('Error saving screenshot: ', err);
           // not matter
         }
       default:
         result = await playwright[`_${hook}`](tests[id]);
     }
 
-    res.status(200).json({ result, test: tests[id] });
+    const test = tests[id];
+    res.status(200).json({ result, test });
   } catch (error) {
     const message = error.inspect ? error.inspect() : error.message;
     res.status(500).json({ message });

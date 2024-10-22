@@ -98,7 +98,7 @@ modules:
             url: 'http://localhost'
             browser: 'chromium'
             show: true
-            pw_server: http://localhost:8191
+            pw_server: http://localhost:9999
 ```
 
 ## API

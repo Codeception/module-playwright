@@ -70,7 +70,7 @@ More configuration options are is listed on [CodeceptJS Playwright page](https:/
 Playwright module requires NodeJS server to be running. Start the server manually:
 
 ```
-npx codeception-playwright-module
+npx codeception-module-playwright
 ```
 
 If you want to start server automatically, use [RunProcess extension](https://codeception.com/extensions#RunProcess) from Codeception

@@ -24,6 +24,6 @@
     ],
     "require": {
         "codeception/codeception": "^5.0",
-        "symfony/process": "^6 || ^7"
+        "symfony/process": "^6 || ^7 || ^8"
     }
 }

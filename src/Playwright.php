@@ -36,6 +36,7 @@ class Playwright extends Module
 
     protected string $testId;
     protected bool $testHasFailed = false;
+    protected ?array $currentTest = null;
 
     public function _initialize()
     {
@@ -106,7 +107,7 @@ class Playwright extends Module
                     $test->getMetadata()->addReport($artifact, $file);
                 }
             }
-            unset($this->currentTest);
+            $this->currentTest = null;
         }
     }
 
@@ -930,13 +931,10 @@ class Playwright extends Module
 
         if ($result === false) {
             $error = curl_error($ch);
-            curl_close($ch);
             throw new ModuleException($this, "Playwright server did not respond. Error: $error");
         }
 
         $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        curl_close($ch);
 
         if (!$httpStatusCode || $httpStatusCode === 500) {
             if ($this->config['pw_debug']) {
